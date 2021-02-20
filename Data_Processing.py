@@ -7,6 +7,7 @@ import os
 import datetime
 import numpy as np
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 
 
 #Set working directory
@@ -124,7 +125,7 @@ for key in data:
 #%%
 
 for key in data:
-    data[key]=data[key].filter([str(i) for i in range(2010,2016)], axis=1)
+    data[key]=data[key].filter([str(i) for i in range(2011,2018)], axis=1)
     plot_percent_non_null(data[key])
 #%%
 
@@ -153,40 +154,131 @@ def drop_non_reporters(df_in, max_percent_missing=0.6):
 
    
 
+#Remove Countries that are missing >80% of their data 
+#for key in data:
+#    data[key]=drop_non_reporters(data[key], max_percent_missing=0.8)
+#    plot_percent_non_null(data[key])
 
-for key in data:
-    data[key]=drop_non_reporters(data[key], max_percent_missing=0.8)
-    plot_percent_non_null(data[key])
+
+#%%
+    
+def linear_reg_fill_data(data_in):
+    """
+    Takes a dataframe of countries with missing data and runs a linear regression to predict and infill the values of 
+    the missing datas. 
+    Each country requires at least 2 datapoints present to run the regression.
+    Countries with less than the minimum number of datapoints are converted fully into nans
+    
+    Returns the complete dataframe with original data and filled in predicted values.
+    
+    df_in: The Dataframe of years of data
+    """
+    
+    
+    
+    def linear_reg_fill(country_in):
+        """
+        Takes a country series with missing data and runs a linear regression to predict the values of 
+        the nans. Requires at least 2 datapoints to run the regression.
+        Returns the series with original data and filled in predicted values.
+        
+        country_in: A country series that is missing at least 1 datapoint, and has at least 2 existing datapoints.
+        """
+        
+        #Seperate out the null and non-null components
+        not_null = country_in[country_in.notnull()]
+        yes_null = country_in[~country_in.notnull()]
+            
+        #Fit the regression on available data
+        reg = LinearRegression().fit(not_null.index.values.astype(int).reshape(-1, 1), not_null.values.reshape(-1, 1))
+        
+        #predict the missing values and in-fill the missing data
+        pred = reg.predict(yes_null.index.values.astype(int).reshape(-1, 1))
+        yes_null.loc[:]=pred.reshape(-1, )
+        
+        #Merge into one series and return
+        country_in=pd.concat([not_null, yes_null])
+        
+        return country_in
+    
+    
+    
+    
+    #Collection list to be converted to df later
+    filled_data=[]
+    
+    for i in range(data_in.shape[0]):
+        
+        #Run for one country at a time 
+        this_country = data_in.iloc[i,:].copy()
+        
+        # If the country has minimum 2 datapoints, run a linear model on the data to fill in any nan values
+        # If if doesn't turn all values to nan
+        
+        #If all datapoints are present
+        if this_country.notnull().sum()==this_country.shape[0]:
+            pass
+        
+        #If there is one or 0 datapoint we cannot use the data.
+        elif this_country.notnull().sum() <=1:
+            this_country.loc[:] = np.nan
+        
+        #There is missing data, but enought to fit the model
+        else:
+            this_country=linear_reg_fill(this_country)
+            
+        #Append to the collector
+        filled_data.append(this_country)    
+    
+    #Concat into one dataframe    
+    filled_data=pd.DataFrame(filled_data)
+    
+    return filled_data
 
 
 
 
 #%%
+
+for key in data:
+    data[key]=linear_reg_fill_data(data[key])
+    plot_percent_non_null(data[key]) 
+
+
+#%%
+"""
+Need to remove some of the rows that represent economies rather than countries
+
+Skim the top 40 of each set and drop all non-country entries found.
+
+"""    
     
+not_a_country=np.array([])
+    
+ #Check if a   
+
+for key in data:
+    #print(data[key].sort_values('2017', ascending=False).head(40))
+    not_a_country=np.append(not_a_country,data[key].sort_values('2017', ascending=False).head(40).index.values)
+
+
+not_a_country=list(set(not_a_country))
+
+not_a_country=[i for i in not_a_country if i not in ['Japan','Russian Federation','Saudi Arabia','Italy','Korea, Rep.' ,'Brazil',
+                      'Germany', 'India', 'China', 'Israel', 'France', 'United States',
+                      'United Kingdom', 'Australia', ]]
+
+#Ran again, these are the last economies present
+still_not_countries=['Other small states','Central Europe and the Baltics', 'Small states', ]
+
+#Drop all the economies that are present
+for key in data:
+    data[key]=data[key].drop(not_a_country, axis=0)
+    data[key]=data[key].drop(still_not_countries, axis=0)
+   
+#%%
+for key in data:
+    print(f'\n\n ---------------  {key}  ---------------------\n\n')
+    print(data[key].sort_values('2017', ascending=False).head(40))    
     
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    

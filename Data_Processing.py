@@ -63,7 +63,7 @@ edu=edu.set_index('Country Name')
 del supplimental, edu_fill
 
 
-#%%
+
 
 #Import the rest of the data
 #Will need additional pre-processing
@@ -74,7 +74,7 @@ mil=os.path.abspath(wd+'//Data//API_MS.MIL.XPND.CD_DS2_en_csv_v2_1928211.csv')
 mil=pd.read_csv(mil, skiprows=[0,1,2], index_col='Country Name')
 
 
-gdp=os.path.abspath(wd+'//Data//API_MS.MIL.XPND.CD_DS2_en_csv_v2_1928211.csv')
+gdp=os.path.abspath(wd+'//Data//API_NY.GDP.MKTP.CD_DS2_en_csv_v2_2001204.csv')
 gdp=pd.read_csv(gdp, skiprows=[0,1,2], index_col='Country Name')
 
 
@@ -82,24 +82,30 @@ pop=os.path.abspath(wd+'//Data//API_SP.POP.TOTL_DS2_en_csv_v2_1976634.csv')
 pop=pd.read_csv(pop, skiprows=[0,1,2], index_col='Country Name')
 
 
+health=os.path.abspath(wd+'//Data//API_SH.XPD.CHEX.GD.ZS_DS2_en_csv_v2_2055594.csv')
+health=pd.read_csv(health, skiprows=[0,1,2], index_col='Country Name')
 
-#Education is currently expressed as a % of gdp
-#Convert it to Current USD for uniformity
+#Education and healthcare are currently expressed as a % of gdp
+#Convert them to Current USD for uniformity
 
 for col in range(1960, 2020):
     edu[str(col)] = gdp[str(col)]*edu[str(col)]/100
+
+for col in range(1960, 2020):
+    health[str(col)] = gdp[str(col)]*health[str(col)]/100
+
 
 
 #Now all financial measures are in USD.
 del col
 #%%
 #Collect data
-data={'MIL':mil, 'GDP':gdp, 'EDU':edu, 'POP':pop}
+data={'MIL':mil, 'GDP':gdp, 'EDU':edu, 'POP':pop, 'HEAL':health}
 
 for key in data:
     data[key]=data[key].drop(['Country Code', 'Indicator Name', 'Indicator Code', '2020', 'Unnamed: 65'], axis=1)
 
-
+del [mil, gdp,edu,pop,health]
 #%%
     
 def plot_percent_non_null(df_in):
@@ -276,9 +282,172 @@ for key in data:
     data[key]=data[key].drop(not_a_country, axis=0)
     data[key]=data[key].drop(still_not_countries, axis=0)
    
+del [not_a_country,still_not_countries]    
 #%%
 for key in data:
     print(f'\n\n ---------------  {key}  ---------------------\n\n')
     print(data[key].sort_values('2017', ascending=False).head(40))    
     
 
+#%%
+    
+"""
+Make the divided factors values
+"""
+
+#Extract the data from the dict
+
+gdp=data['GDP']
+pop=data['POP']
+
+
+def per_capita(df_in, pop_in=pop):
+    '''
+    Returns The given stats as a per capita value
+    
+    df_in: The Dataframe of years of data
+    pop_in: The Population Dataframe - default pop
+    '''
+    return df_in/pop_in
+
+def per_GDP(df_in, gdp_in=gdp):
+    '''
+    Returns The given stats as a percent gdp value
+    
+    df_in: The Dataframe of years of data
+    gdp_in: The GDP Dataframe - default pop
+    '''
+    return df_in/gdp_in*100
+
+
+
+def rate_of_change(df_in):
+    '''
+    Calculates the absolute and percent change for each year
+    Returns tuple of absolute change, percent change
+    
+    df_in: The Dataframe of years of data
+    '''
+
+    #Absolute Rate of change
+    abs_delta=df_in.diff(axis=1)
+    
+    #Percent Rate of Change
+    per_delta=df_in.pct_change(axis=1)
+    
+    return abs_delta, per_delta
+
+
+
+#Per Capita
+per_cap ={}
+for key in data:
+    per_cap[key]= per_capita(data[key])
+
+
+#Percent_GDP
+per_gdp ={}
+for key in data:
+    per_gdp[key]= per_GDP(data[key])
+
+
+#Rate of Change    
+abs_change ={}
+per_change ={}
+for key in data:
+    abs_change[key],per_change[key] = rate_of_change(data[key])
+
+
+
+del gdp, pop
+
+
+#%%
+
+def writer_helper(df_in, sheet_name_in, writer_engine):
+    """
+    Sorts and selects the top 10 countries for the dataframe inserted
+    Selects the top 10 based of the final year's values.
+    
+    Returns the shortened daaframe
+    """
+
+    #Sort by final values and shorten
+    df_out=df_in.sort_values(data[key].columns[-1], ascending=False)
+    df_out=df_out.head(10)
+    
+    #Add the sheet
+    df_out.to_excel(writer_engine, sheet_name=sheet_name_in) 
+
+
+
+
+writer = pd.ExcelWriter('Processed_Data.xlsx', engine='xlsxwriter')
+
+#The total numbers
+for key in data:
+    writer_helper(data[key], sheet_name_in='Values_'+key , writer_engine=writer)
+
+
+
+    
+#The per Capita numbers
+for key in ['MIL', 'GDP', 'EDU', 'HEAL']:
+    writer_helper(per_cap[key], sheet_name_in='Per_Capita_'+key , writer_engine=writer)
+
+
+#The per GDP numbers
+for key in ['MIL', 'EDU', 'HEAL']:
+    writer_helper(per_gdp[key], sheet_name_in='Percent_GDP_'+key , writer_engine=writer)
+
+
+#The absolute change numbers
+for key in ['MIL', 'EDU', 'HEAL']:
+    writer_helper(abs_change[key], sheet_name_in='Delta_ABS_'+key , writer_engine=writer)
+
+
+#The percent change numbers
+for key in ['MIL', 'EDU', 'HEAL']:
+    writer_helper(per_change[key], sheet_name_in='Delta_PER_'+key , writer_engine=writer)
+
+
+#Save and close the whole file
+writer.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    

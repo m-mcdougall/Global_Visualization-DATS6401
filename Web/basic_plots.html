@@ -33,9 +33,13 @@
             data.sort({column: 6, desc: true});
 
             var options= {
-                vAxis: {title: 'Spending in Billions(s)'},
-                hAxis: {title: 'Country'}
-            };
+                    chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
+                    width : 900,
+                    height: 400,
+                    vAxis: {title: 'Spending in Billions(s)'},
+                    hAxis: {title: 'Country', slantedText: true},
+                    
+                };
 
             var chart = new google.visualization.ColumnChart(document.getElementById('military_spending_div'));
             chart.draw(data, options);

@@ -12,3 +12,7 @@ Global Healthcare Data (% of GDP)  - [https://data.worldbank.org/indicator/SH.XP
 ### Supplementary Data
 Education - [https://data.oecd.org/eduresource/public-spending-on-education.htm#indicator-chart], Public spending on education Primary to tertiary, % of GDP, 1995 – 2016
 OECD (2021), Public spending on education (indicator). doi: 10.1787/f99b45d0-en (Accessed on 19 February 2021)
+
+
+### Header Image
+1944 Mercator map of the world united. G3201.A5 1944 .C43/OLIVER K. WHITING/NORMAN B. LEVENTHAL MAP CENTER/BOSTON PUBLIC LIBRARY

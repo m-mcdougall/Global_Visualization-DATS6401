@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang='en'>
+
+<head>
+    <meta  charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content='IE=edge'>
+    <meta name="viewport" content="width=1024, initial-scale=1.0">
+    <title>Military Spending</title>
+    <script src='https://www.gstatic.com/charts/loader.js'></script>
+    <script>
+        google.charts.load('current', {'packages':['corechart', 'geochart']});
+        google.charts.setOnLoadCallback(drawAllSheets);
+
+        function drawAllSheets() {
+            drawSheetName ('militaryspending', 'SELECT A,B,C,D,E,F', militarySpendingResponseHandler);
+            drawSheetName ('militaryspending', 'SELECT A,F', topmilitarySpendingResponseHandler);
+            drawSheetName ('meanmilitaryspending', 'SELECT A,G', averageSpendingResponseHandler);
+            drawSheetName ('sharedgdp', 'SELECT A,B,C,D,E,F', sharedGDPResponseHandler);
+            drawSheetName ('sharedgdp', 'SELECT A,F', topSharedGDPResponseHandler);
+            drawSheetName ('percapita', 'SELECT A,F', topPerCapitaResponseHandler);
+            drawSheetName ('percapitagdp', 'SELECT A,P,Q,R,S,T', PerCapitaGDPResponseHandler);
+            drawSheetName ('annualgrowth', 'SELECT A,G', annualGrowthGDPResponseHandler);
+            drawSheetName ('totalGDP', 'SELECT A,F,S', totalGDPMilitarySpendingResponseHandler);
+
+        } //drawAllSheetsS
+        function drawSheetName(sheetName, query, responseHandler){
+            var queryString = encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1-NwogHiqjRPfIEeh7XxgDYj1CIjyzrz7hxYus4I2VQY/gviz/tq?sheet='
+                + sheetName +'&headers=1&tq=' + queryString );
+
+            query.send(responseHandler)    
+        }//drawSheetName
+
+        function checkError(response){
+            if (response.isError()){
+                alert('Error in Query: '+ response.getMessage() + ' '+ response.getDetailedMessage() );
+            }}
+
+        function militarySpendingResponseHandler (response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 5, desc: true});
+
+            var options= {
+                vAxis: {title: 'Spending in Billions(s)'},
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('military_spending_div'));
+            chart.draw(data, options);
+        }//militarySpendingResponseHandler
+
+        function topmilitarySpendingResponseHandler(response){
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = {
+                colorAxis: {colors: ['#e7711c', '#4374e0']}, //orange to blue
+                title: 'Top 10 countries by mil spending in USD (Billions)'
+            };
+            var chart = new google.visualization.GeoChart(document.getElementById('top_military_spending_div'));
+            chart.draw(data, options);
+
+        }//topmilitarySpendingResponseHandler
+
+        function averageSpendingResponseHandler(response){
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                vAxis: {title:'Country'},
+                hAxis: {title:'Spending'},
+            };
+            //Using Data Directly
+            //var formatter = new google.visualization.NumberFormat({
+              //  fractionDigits: 2, prefix: '$'});
+
+            //formatter.format(data, 1);
+
+            //Using a View
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1,{
+                calc: function(dt,row){
+                    return Math.floor(dt.getFormattedValue(row,1)) + 'B';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }]);
+
+            var chart = new google.visualization.BarChart(document.getElementById('avg_spending_div'));
+            chart.draw(view, options);
+
+        }//averageSpendingResponseHandler
+
+        function sharedGDPResponseHandler(response){
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = {};
+            var chart = new google.visualization.ColumnChart(document.getElementById('shared_gdp_div'));
+            chart.draw(data, options);
+
+        }//sharedGDPResponseHandler
+
+
+        function topSharedGDPResponseHandler(response){
+            var data = response.getDataTable();
+            //data.sort({column: 1, desc: true});
+
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                annotations: {alwaysOutside: true},
+                title: 'Top 10 by Military Expense for 2015 as % GDP',
+                vAxis: {title:'Country'},
+                hAxis: {title:'%'},
+            };
+
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,1, {
+                calc: function(dt,row){
+                    return Math.ceil(dt.getFormattedValue(row,1)) + '%';
+                },
+                sourceColumn: 1,
+                type: 'string',
+                role: 'annotation'
+            }])
+
+            var chart = new google.visualization.BarChart(document.getElementById('top_shared_gdp_div'));
+            chart.draw(view, options);
+
+        }//topSharedGDPResponseHandler
+
+
+        function topPerCapitaResponseHandler(response){
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('top_per_capita_div'));
+            chart.draw(data, {title: 'Per Capita Spending 2015'});
+
+        }//topPerCapitaResponseHandler
+
+
+        function PerCapitaGDPResponseHandler(response){
+            var data = response.getDataTable();
+            data.sort({column: 5, desc: true});
+
+            var options = {
+                legend: {position: 'top', maxLines:3},
+                bars: {groupWidth: "75%"},
+                isStacked: true
+            };
+
+            var chart = new google.visualization.BarChart(document.getElementById('per_capita_gdp_div'));
+            chart.draw(data, options);
+
+        }//PerCapitaGDPResponseHandler
+
+        
+        function annualGrowthGDPResponseHandler(response){
+            var data = response.getDataTable();
+            
+
+            var chart = new google.visualization.GeoChart(document.getElementById('annual_growth_div'));
+            chart.draw(data);
+
+        }//annualGrowthGDPResponseHandler
+
+
+        function totalGDPMilitarySpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = {
+                legend: 'none',
+                bars: 'horizontal',
+                isStacked: true,
+                annotations: {alwaysOutside: true},
+                title: 'Military Spending vs Total GDP for 2015',
+                vAxis: {title:'Country'},
+                hAxis: {title:'Spending in Billions (USD)'},
+            };
+
+            var chart = new google.visualization.BarChart(document.getElementById('total_gdp_military_spending_div'));
+            chart.draw(data, options);
+
+        }//totalGDPMilitarySpendingResponseHandler
+    </script>
+
+</head>
+<body>
+    <h3>Military Spending Analysis for Top 10 Countries</h3>
+    <div id='military_spending_div' style= 'width: 900px; height:500px'></div>
+    <br>
+    <div id='top_military_spending_div' style= 'width: 900px; height:500px'></div>
+    <br>
+    <div id='avg_spending_div' style= 'width: 900px; height:500px'></div> 
+    <br>
+    <div id='shared_gdp_div' style= 'width: 900px; height:500px'></div> 
+    <br>
+    <div id='top_shared_gdp_div' style= 'width: 900px; height:500px'></div> 
+    <br>
+    <div id='top_per_capita_div' style= 'width: 900px; height:500px'></div> 
+    <br>
+    <div id='per_capita_gdp_div' style= 'width: 900px; height:500px'></div> 
+    <br>
+    <div id='annual_growth_div' style= 'width: 900px; height:500px'></div> 
+    <br>
+    <div id='total_gdp_military_spending_div' style= 'width: 900px; height:500px'></div> 
+</body>
+</html>

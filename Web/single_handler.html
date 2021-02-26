@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang='en'>
+
+<head>
+    <meta  charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content='IE=edge'>
+    <meta name="viewport" content="width=1024, initial-scale=1.0">
+    <title>Military Spending</title>
+    <script src='https://www.gstatic.com/charts/loader.js'></script>
+    <script>
+        google.charts.load('current', {'packages':['corechart', 'geochart']});
+        google.charts.setOnLoadCallback(drawAllSheets);
+
+        function drawAllSheets() {
+            drawSheetName ('Values_HEAL', 'SELECT A,B,C,D,E,F,H', BasicAbsolueSpendingResponseHandler, 'health_absolute_div2');
+
+
+        } //drawAllSheetsS
+        function drawSheetName(sheetName, query, responseHandler, div2){
+            var queryString = encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1CfQIBsY95ePfWfF5PmAS2eMHvBrvDU0G/gviz/tq?sheet='
+                + sheetName +'&headers=1&tq=' + queryString );
+
+            var div2 = 'health_absolute_div3'    
+            var plt = query.send(responseHandler)    
+
+            console.log(plt)
+            var options= {
+                    chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
+                    width : 900,
+                    height: 400,
+                    annotations: {alwaysOutside: true},
+                    vAxis: {title: 'Spending in Billions(s)'},
+                    hAxis: {title: 'Country', slantedText: false},
+                    
+                };
+
+            //var chart = new google.visualization.ColumnChart(document.getElementById('health_absolute_div'));
+            //chart.draw(data, options);
+
+            var chart = new google.visualization.ColumnChart(document.getElementById(div2));
+            chart.draw(plt, options);
+
+
+        }//drawSheetName
+
+
+        function BasicAbsolueSpendingResponseHandler (response, div2 = 'health_absolute_div2' ){
+            var data = response.getDataTable();
+            return data
+
+            data.sort({column: 6, desc: true});
+
+            var options= {
+                    chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
+                    width : 900,
+                    height: 400,
+                    annotations: {alwaysOutside: true},
+                    vAxis: {title: 'Spending in Billions(s)'},
+                    hAxis: {title: 'Country', slantedText: false},
+                    
+                };
+
+            //var chart = new google.visualization.ColumnChart(document.getElementById('health_absolute_div'));
+            //chart.draw(data, options);
+
+            var chart = new google.visualization.ColumnChart(document.getElementById(div2));
+            chart.draw(data, options);
+            return data;
+        }//BasicAbsolueSpendingResponseHandler
+
+
+
+
+
+
+
+
+    </script>
+
+</head>
+<body>
+    <h3>Healthcare Spending Analysis for Top 10 Countries</h3>
+    <div id='health_absolute_div' style= 'width: 900px; height:500px'></div>
+    <h3>Div2</h3>
+    <div id='health_absolute_div2' style= 'width: 900px; height:500px'></div>
+    <h3>Div3</h3>
+    <div id='health_absolute_div3' style= 'width: 900px; height:500px'></div>
+</body>
+</html>
+

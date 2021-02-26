@@ -13,14 +13,15 @@
         google.charts.setOnLoadCallback(drawAllSheets);
 
         function drawAllSheets() {
-            drawSheetName ('Values_MIL', 'SELECT A,B,C,D,E,F,H', militarySpendingResponseHandler);
-
+            drawSheetName ('Values_HEAL', 'SELECT A,B,C,D,E,F,H', BasicAbsolueSpendingResponseHandler);
+            drawSheetName ('Percent_GDP_HEAL', 'SELECT A,B,C,D,E,F,H', BasicGDPSpendingResponseHandler);
+            drawSheetName ('Per_Capita_HEAL', 'SELECT A,B,C,D,E,F,H', BasicCapitaSpendingResponseHandler);
 
         } //drawAllSheetsS
         function drawSheetName(sheetName, query, responseHandler){
             var queryString = encodeURIComponent(query);
             var query = new google.visualization.Query(
-                'https://docs.google.com/spreadsheets/d/1RMyTtgl-X1JsqbuZJqPAiR6nS9qPX5DcYsKK-dZKdpM/gviz/tq?sheet='
+                'https://docs.google.com/spreadsheets/d/1CfQIBsY95ePfWfF5PmAS2eMHvBrvDU0G/gviz/tq?sheet='
                 + sheetName +'&headers=1&tq=' + queryString );
 
             query.send(responseHandler)    
@@ -36,22 +37,101 @@
                     chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
                     width : 900,
                     height: 400,
+                    annotations: {alwaysOutside: true},
                     vAxis: {title: 'Spending in Billions(s)'},
-                    hAxis: {title: 'Country', slantedText: true},
+                    hAxis: {title: 'Country', slantedText: false},
                     
                 };
 
+            var view = new google.visualization.DataView(data);
+            var i=1;
+            for (i=1; i<6; i++) {
+                    
+                view.setColumns([0,i, {
+                calc: function(dt,row){
+                    return Math.ceil(dt.getFormattedValue(row,i))+ '%';
+                },
+                sourceColumn: i,
+                type: 'string',
+                role: 'annotation'
+            }])
+
+            };
+
+
             var chart = new google.visualization.ColumnChart(document.getElementById('military_spending_div'));
-            chart.draw(data, options);
+            chart.draw(view, options);
         }//militarySpendingResponseHandler
+
+
+        function BasicAbsolueSpendingResponseHandler (response){
+            var data = response.getDataTable();
+            data.sort({column: 6, desc: true});
+
+            var options= {
+                    chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
+                    width : 900,
+                    height: 400,
+                    annotations: {alwaysOutside: true},
+                    vAxis: {title: 'Spending in Billions(s)'},
+                    hAxis: {title: 'Country', slantedText: false},
+                    
+                };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('health_absolute_div'));
+            chart.draw(data, options);
+        }//BasicAbsolueSpendingResponseHandler
+
+
+
+        
+        function BasicGDPSpendingResponseHandler (response){
+            var data = response.getDataTable();
+            data.sort({column: 6, desc: true});
+
+            var options= {
+                    chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
+                    width : 900,
+                    height: 400,
+                    annotations: {alwaysOutside: true},
+                    vAxis: {title: 'Spending as % GDP'},
+                    hAxis: {title: 'Country', slantedText: false},
+                    
+                };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('health_GDP_div'));
+            chart.draw(data, options);
+        }//BasicAbsolueSpendingResponseHandler
+
+        
+        function BasicCapitaSpendingResponseHandler (response){
+            var data = response.getDataTable();
+            data.sort({column: 6, desc: true});
+
+            var options= {
+                    chartArea: {width:'70%', height:'60%'},//{width:900, height:600},
+                    width : 900,
+                    height: 400,
+                    annotations: {alwaysOutside: true},
+                    vAxis: {title: 'Spending per Capita'},
+                    hAxis: {title: 'Country', slantedText: false},
+                    
+                };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('health_capita_div'));
+            chart.draw(data, options);
+        }//BasicAbsolueSpendingResponseHandler
+
 
     </script>
 
 </head>
 <body>
-    <h3>Military Spending Analysis for Top 10 Countries</h3>
-    <div id='military_spending_div' style= 'width: 900px; height:500px'></div>
-  
+    <h3>Healthcare Spending Analysis for Top 10 Countries</h3>
+    <div id='health_absolute_div' style= 'width: 900px; height:500px'></div>
+    <div id='health_GDP_div' style= 'width: 900px; height:500px'></div>
+    <div id='health_capita_div' style= 'width: 900px; height:500px'></div>
+    
 </body>
 </html>
 

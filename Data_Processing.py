@@ -290,6 +290,16 @@ for key in data:
     
 
 #%%
+
+
+#Rename some country names from the WorldBank format to their more common names
+for key in data:
+    data[key].rename(index={'Russian Federation':'Russia','Iran, Islamic Rep.':'Iran', 'Korea, Rep.': 'South Korea',
+        'Venezuela, RB':'Venezuela', 'Egypt, Arab Rep.':'Egypt', 'United Arab Emirates': 'UAE'}, inplace=True)
+
+    
+
+#%%
     
 """
 Make the divided factors values
@@ -364,7 +374,35 @@ del gdp, pop
 
 #%%
 
-def writer_helper(df_in, sheet_name_in, writer_engine):
+  
+#Scale data to appropriate levels for use
+#GDP and Military expenses in terms of billions
+#Population in millions
+
+#Scale Absolute data to Billions
+for key in data:
+    data[key] = data[key]#/10**9
+
+
+for key in abs_change:
+    abs_change[key] = abs_change[key]#/10**9
+
+
+
+#Scale POP to Millions
+#data[1].iloc[:,2:]=data[1].iloc[:,2:]/10**6    
+
+
+
+
+
+
+
+
+
+
+#%%
+def writer_helper(df_in, parent_df, sheet_name_in, writer_engine):
     """
     Sorts and selects the top 10 countries for the dataframe inserted
     Selects the top 10 based of the final year's values.
@@ -372,9 +410,12 @@ def writer_helper(df_in, sheet_name_in, writer_engine):
     Returns the shortened daaframe
     """
 
-    #Sort by final values and shorten
-    df_out=df_in.sort_values(data[key].columns[-1], ascending=False)
-    df_out=df_out.head(10)
+    #Filter by the parent_df's final countries
+    parent_filter = parent_df.sort_values(parent_df.columns[-1], ascending=False)
+    parent_filter=parent_filter.head(10)
+    df_out=df_in[df_in.index.isin(parent_filter.index)]
+    df_out = df_out.sort_values(df_out.columns[-1], ascending=False)
+
     
     #Add the sheet
     df_out.to_excel(writer_engine, sheet_name=sheet_name_in) 
@@ -386,29 +427,29 @@ writer = pd.ExcelWriter('Processed_Data.xlsx', engine='xlsxwriter')
 
 #The total numbers
 for key in data:
-    writer_helper(data[key], sheet_name_in='Values_'+key , writer_engine=writer)
+    writer_helper(data[key],data[key], sheet_name_in='Values_'+key , writer_engine=writer)
 
 
 
     
 #The per Capita numbers
 for key in ['MIL', 'GDP', 'EDU', 'HEAL']:
-    writer_helper(per_cap[key], sheet_name_in='Per_Capita_'+key , writer_engine=writer)
+    writer_helper(per_cap[key], data[key], sheet_name_in='Per_Capita_'+key , writer_engine=writer)
 
 
 #The per GDP numbers
 for key in ['MIL', 'EDU', 'HEAL']:
-    writer_helper(per_gdp[key], sheet_name_in='Percent_GDP_'+key , writer_engine=writer)
+    writer_helper(per_gdp[key], data[key], sheet_name_in='Percent_GDP_'+key , writer_engine=writer)
 
 
 #The absolute change numbers
 for key in ['MIL', 'EDU', 'HEAL']:
-    writer_helper(abs_change[key], sheet_name_in='Delta_ABS_'+key , writer_engine=writer)
+    writer_helper(abs_change[key], data[key], sheet_name_in='Delta_ABS_'+key , writer_engine=writer)
 
 
 #The percent change numbers
 for key in ['MIL', 'EDU', 'HEAL']:
-    writer_helper(per_change[key], sheet_name_in='Delta_PER_'+key , writer_engine=writer)
+    writer_helper(per_change[key], data[key], sheet_name_in='Delta_PER_'+key , writer_engine=writer)
 
 
 #Save and close the whole file

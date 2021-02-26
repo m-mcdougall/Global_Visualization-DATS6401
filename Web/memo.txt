@@ -4,3 +4,37 @@ python -m http.server 9000
 
 
 http://localhost:9000/
+
+
+
+
+##########
+
+Changes To- Do
+
+Add the other plots
+
+Add the other categories
+
+Add the menu buttons to the other sections
+
+New images for the Metrics sections
+
+Add references/sources at the bottom in a new container
+
+Menu button for sources
+
+Change the top 10 to a take-away summary
+
+Add flags
+
+##########
+
+Changes Wishlist (Non-essential)
+
+Add a button on the profiles to swap between modelos
+
+Add a global geoplot to show all country's healthcare/edu/mil above the 2x3 set
+
+Make the box around the 'Healthcare' smaller
+

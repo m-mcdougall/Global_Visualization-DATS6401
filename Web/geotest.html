@@ -4,7 +4,8 @@
     <script type="text/javascript">
 
       // Load the Visualization API and the controls package.
-      google.charts.load('current', {'packages':['controls', 'corechart']});
+      google.charts.load('current', {'packages':['controls', 'corechart', 'geochart'],
+      'mapsApiKey': 'AIzaSyBoVxauKlXr5UIbGZzMpsao8hc8haGG64Y'});
 
       // Set a callback to run when the Google Visualization API is loaded.
       google.charts.setOnLoadCallback(initialize);
@@ -28,16 +29,16 @@
 
      var query = new google.visualization.Query(
        'https://docs.google.com/spreadsheets/d/19XH4jbKGMJS6aarHaSE-1GISPpuA377jl5GwWM7XTYU/gviz/tq?sheet='
-        + 'Dashboard_Health' +'&headers=1&tq?' + 'range=A1:L22' ); 
+        + 'Global_Health' +'&headers=1&tq?' + 'range=A1:D24' ); 
      
 
-    query.send(drawDashboard)    
+    query.send(drawGeoDashboard)    
 
 }
 
-function drawDashboard(response) {
+function drawGeoDashboard(response) {
   var data = response.getDataTable();
- 
+  console.log(data)
   //First Control wrapper  - Filters by Category of Data
   var namePicker = new google.visualization.ControlWrapper({
     'controlType': 'CategoryFilter',
@@ -53,41 +54,44 @@ function drawDashboard(response) {
       }
     },
     state: {
-      selectedValues: ['Absolute']
+      selectedValues: ['Percent Change']
     }
   });
 
   //Second Control wrapper  - Sliding bar that Filters by Year of Data
   var TypePicker = new google.visualization.ControlWrapper({
-    'controlType': 'NumberRangeFilter',
+    'controlType': 'CategoryFilter',
     'containerId': 'filter2_div',
     'options': {
-      'filterColumnLabel': 'Country',
+      'filterColumnLabel': 'Years',
       'ui': {
         'label': 'Select Year Range',
-        format: {pattern: '0000'},
         'labelStacking': 'vertical',
         'allowTyping': false, 
-        'allowMultiple': false  
+        'allowMultiple': false,
+        'allowNone' : false  
       }
-    }
+    },
+    state: {
+      selectedValues: ['2011-2017']}
   });
   
+
   //Actual chart wrapper here
   var DashColumnChart = new google.visualization.ChartWrapper({
-    'chartType': 'ColumnChart',
+    'chartType': 'GeoChart',
     'containerId': 'chart_div',
-    view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
+    view: {columns: [1,3]},
     options : {
                     chartArea: {width:'60%', height:'60%'},
                     width : 1000,
                     height: 400,
-                    annotations: {alwaysOutside: true},
-                    vAxis: {title: 'Spending',  format: 'short', },
-                    hAxis: {title: 'Year', slantedText: false, format:'#,####'},
-                    tooltip: {format:'scientific'},    
-                    //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
-                    colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
+                    colorAxis: {colors: ['#201600', '#5F4100', '#9E6D00', '#DD9800', '#FDAE00']},
+                    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],},          
+                
+                    //colorAxis: {minValue : -range, maxValue : range,colors: ['blue', 'white', 'red']}
+                          
                 }
 
   });
@@ -97,12 +101,12 @@ function drawDashboard(response) {
     bind([namePicker, TypePicker], DashColumnChart).
     draw(data)
 
-    console.log(data)
 } // End of the dashboard script
     </script>
   </head>
 
   <body>
+    <input type="button" value="Toggle Percent/Absolute Change" onclick="changeView()" />
     <!--Div that will hold the dashboard-->
     <div id="dashboard_div">
       <!--Divs that will hold each control and chart-->

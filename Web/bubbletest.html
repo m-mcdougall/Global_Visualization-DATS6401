@@ -28,7 +28,7 @@
 
      var query = new google.visualization.Query(
        'https://docs.google.com/spreadsheets/d/19XH4jbKGMJS6aarHaSE-1GISPpuA377jl5GwWM7XTYU/gviz/tq?sheet='
-        + 'Dashboard_Health' +'&headers=1&tq?' + 'range=A1:L22' ); 
+        + 'Bubble_Health' +'&headers=1&tq?' + 'range=A1:F22' ); 
      
 
     query.send(drawDashboard)    
@@ -37,23 +37,25 @@
 
 function drawDashboard(response) {
   var data = response.getDataTable();
- 
-  //First Control wrapper  - Filters by Category of Data
-  var namePicker = new google.visualization.ControlWrapper({
+
+
+    //First Control wrapper  - Filters by Category of Data
+    var namePicker = new google.visualization.ControlWrapper({
     'controlType': 'CategoryFilter',
     'containerId': 'filter_div',
     'options': {
-      'filterColumnLabel': 'Type',
+      'filterColumnLabel': 'Color',
       'ui': {
-        'label': 'Spending Representation',
+        'label': 'Select countries to Display',
         'labelStacking': 'vertical',
         'allowTyping': false, //User gets a text box to type into
-        'allowMultiple': false,   /// Lets you select dorp-down options one at a time, can click multiple at a time - Useful but not for here
+        'allowMultiple': true,   /// Lets you select dorp-down options one at a time, can click multiple at a time - Useful but not for here
         'allowNone' : false //disables the "Select a value" - it's confusing
       }
     },
     state: {
-      selectedValues: ['Absolute']
+      selectedValues: ['United States', 'Germany', 'Australia', 'France', 'Japan',
+                    'United Kingdom', 'Italy', 'South Korea', 'Brazil', 'China']
     }
   });
 
@@ -62,7 +64,7 @@ function drawDashboard(response) {
     'controlType': 'NumberRangeFilter',
     'containerId': 'filter2_div',
     'options': {
-      'filterColumnLabel': 'Country',
+      'filterColumnLabel': 'Year',
       'ui': {
         'label': 'Select Year Range',
         format: {pattern: '0000'},
@@ -72,43 +74,85 @@ function drawDashboard(response) {
       }
     }
   });
-  
-  //Actual chart wrapper here
+
+
+//Need to calculate the range to adjust the frame to the bubblesize or will cut off. Not done automatically for some reason.
+  var rangeX = data.getColumnRange(1);
+  var fractionX = (rangeX.max -rangeX.min)*0.1;
+
+  var rangeY = data.getColumnRange(2);
+  var fractionY = (rangeY.max -rangeY.min)*0.2;
+
   var DashColumnChart = new google.visualization.ChartWrapper({
-    'chartType': 'ColumnChart',
+    'chartType': 'BubbleChart',
     'containerId': 'chart_div',
-    view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
+    view: {columns: [0,1,2,3]},
     options : {
                     chartArea: {width:'60%', height:'60%'},
                     width : 1000,
                     height: 400,
                     annotations: {alwaysOutside: true},
-                    vAxis: {title: 'Spending',  format: 'short', },
-                    hAxis: {title: 'Year', slantedText: false, format:'#,####'},
-                    tooltip: {format:'scientific'},    
+                    vAxis: {title: 'Spending',
+                            viewWindow: { 
+                                min: rangeY.min-fractionY,
+                                max: rangeY.max+fractionY
+                                },
+                            format: 'short',  },
+                    hAxis: {title: 'Per Capita Healthcare Spending',  
+                            viewWindow: { 
+                                min: rangeX.min-fractionX,
+                                max: rangeX.max+fractionX
+                                },
+                            format: 'short',  },
                     //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
                     colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
                 }
 
   });
 
-  //Bind the control wrapers to the data, then draw the chart
-  var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div')).
+
+      var dashboard = new google.visualization.Dashboard(document.getElementById('chart_div')).
     bind([namePicker, TypePicker], DashColumnChart).
     draw(data)
 
-    console.log(data)
-} // End of the dashboard script
+    }//End BubbleChart
+
     </script>
   </head>
 
   <body>
     <!--Div that will hold the dashboard-->
     <div id="dashboard_div">
-      <!--Divs that will hold each control and chart-->
-      <div id="filter_div"></div>
-      <div id="filter2_div"></div>
-      <div id="chart_div" style="height: 800px;"></div>
+        <!--Divs that will hold each control and chart-->
+        <div id="filter_div"></div>
+        <div id="filter2_div"></div>
+        <div id="chart_div" style="height: 800px;"></div>
     </div>
   </body>
+
+
+<!----
+
+    var rangeX = data.getColumnRange(1);
+
+
+    var options = {
+    title: 'Correlation between life expectancy, fertility rate ' +
+            'and population of some world countries (2010)',
+    hAxis: {title: 'Per Capita Healthcare Spending',  
+            viewWindow: { 
+            min: rangeX.min-0.5,
+            max: rangeX.max+0.5
+                }
+            },
+    vAxis: {title: 'Per Capita GDP'},
+    bubble: {textStyle: {fontSize: 11}},
+    sizeAxis:{minSize:15, maxSize:20}
+    };
+
+    var chart = new google.visualization.BubbleChart(document.getElementById('dashboard_div'));
+    chart.draw(data, options);
+    }
+--->
+
 </html>

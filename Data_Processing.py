@@ -272,7 +272,7 @@ not_a_country=list(set(not_a_country))
 
 not_a_country=[i for i in not_a_country if i not in ['Japan','Russian Federation','Saudi Arabia','Italy','Korea, Rep.' ,'Brazil',
                       'Germany', 'India', 'China', 'Israel', 'France', 'United States',
-                      'United Kingdom', 'Australia', ]]
+                      'United Kingdom', 'Australia','Canada' ]]
 
 #Ran again, these are the last economies present
 still_not_countries=['Other small states','Central Europe and the Baltics', 'Small states', ]
@@ -368,6 +368,13 @@ for key in data:
     abs_change[key],per_change[key] = rate_of_change(data[key])
 
 
+#Trend Rate of Change
+trend_abs_change ={}
+trend_per_change ={}
+
+for key in data:
+    trend_abs_change[key], trend_per_change[key] = rate_of_change(pd.concat([data[key].iloc[:,0] ,data[key].iloc[:,-1]], axis=1))
+
 
 del gdp, pop
 
@@ -414,7 +421,7 @@ def writer_helper(df_in, parent_df, sheet_name_in, writer_engine):
     parent_filter = parent_df.sort_values(parent_df.columns[-1], ascending=False)
     parent_filter=parent_filter.head(10)
     df_out=df_in[df_in.index.isin(parent_filter.index)]
-    df_out = df_out.sort_values(df_out.columns[-1], ascending=False)
+    #df_out = df_out.sort_values(df_out.columns[-1], ascending=False)
 
     
     #Add the sheet
@@ -423,7 +430,7 @@ def writer_helper(df_in, parent_df, sheet_name_in, writer_engine):
 
 
 
-writer = pd.ExcelWriter('Processed_Data.xlsx', engine='xlsxwriter')
+writer = pd.ExcelWriter('Processed_Data2.xlsx', engine='xlsxwriter')
 
 #The total numbers
 for key in data:
@@ -452,13 +459,37 @@ for key in ['MIL', 'EDU', 'HEAL']:
     writer_helper(per_change[key], data[key], sheet_name_in='Delta_PER_'+key , writer_engine=writer)
 
 
+for key in ['MIL', 'EDU', 'HEAL']:
+    abs_value=abs_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
+    abs_value = abs_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    abs_value["Type"] = "Absolute Change"
+
+    per_value=per_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
+    per_value = per_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()})  
+    per_value["Type"] = "Percent Change"
+    
+    
+    
+    trend_abs_value=trend_abs_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
+    trend_abs_value = trend_abs_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    trend_abs_value["Type"] = "Trend Absolute Change"
+    trend_abs_value["Years"] = "2011-2017"
+    
+    trend_per_value=trend_per_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
+    trend_per_value = trend_per_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    trend_per_value["Type"] = "Trend Percent Change"
+    trend_per_value["Years"] = "2011-2017"    
+    
+    value=pd.concat([abs_value, per_value, trend_abs_value, trend_per_value], ignore_index=True)
+    value.to_excel(writer, sheet_name='Global_'+key )
+
+
 #Save and close the whole file
 writer.save()
 
 
 
-
-
+#%%
 
 
 

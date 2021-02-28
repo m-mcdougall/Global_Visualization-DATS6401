@@ -38,3 +38,8 @@ Add a global geoplot to show all country's healthcare/edu/mil above the 2x3 set
 
 Make the box around the 'Healthcare' smaller
 
+
+
+
+####
+

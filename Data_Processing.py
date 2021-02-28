@@ -459,67 +459,179 @@ for key in ['MIL', 'EDU', 'HEAL']:
     writer_helper(per_change[key], data[key], sheet_name_in='Delta_PER_'+key , writer_engine=writer)
 
 
+#Save and close the whole file
+writer.save()
+
+#%%
+
+def df_filter_helper(df_in, parent_df):
+    """
+    Sorts and selects the top 10 countries for the dataframe inserted
+    Selects the top 10 based of the final year's values.
+    
+    Returns the shortened daaframe
+    """
+
+    #Filter by the parent_df's final countries
+    parent_filter = parent_df.sort_values(parent_df.columns[-1], ascending=False)
+    parent_filter=parent_filter.head(10)
+    df_out=df_in[df_in.index.isin(parent_filter.index)]
+    
+    return df_out
+
+def transform_column_rows(df_in):
+    
+    df_out = df_in.dropna().reset_index().melt(id_vars='index')
+    df_out = df_out.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    
+    df_out=df_out.pivot_table(index=['Years'], columns='Country')
+    df_out.columns = df_out.columns.droplevel().rename(None)
+    df_out = df_out.reset_index().rename(columns={'index':'Years'})
+    
+    return df_out
+
+
+
+
+
+##This section only writes in the format that we need for the website
+
+writer = pd.ExcelWriter('Processed_Data3.xlsx', engine='xlsxwriter')
+
+#Writes the table for the global values
 for key in ['MIL', 'EDU', 'HEAL']:
+    
+    #Absolute Volume
     abs_value=abs_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
     abs_value = abs_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
-    abs_value["Type"] = "Absolute Change"
+    abs_value["Years"]=(abs_value["Years"].astype(int)-1).astype(str)+'-'+abs_value["Years"]
 
     per_value=per_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
-    per_value = per_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()})  
-    per_value["Type"] = "Percent Change"
+    per_value = per_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    per_value["Years"]=(per_value["Years"].astype(int)-1).astype(str)+'-'+per_value["Years"]
+   
     
-    
-    
+    #Trends
     trend_abs_value=trend_abs_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
     trend_abs_value = trend_abs_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
-    trend_abs_value["Type"] = "Trend Absolute Change"
     trend_abs_value["Years"] = "2011-2017"
     
     trend_per_value=trend_per_change[key].iloc[:,1::].dropna().reset_index().melt(id_vars='index')
     trend_per_value = trend_per_value.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
-    trend_per_value["Type"] = "Trend Percent Change"
-    trend_per_value["Years"] = "2011-2017"    
+    trend_per_value["Years"] = "2011-2017"   
     
-    value=pd.concat([abs_value, per_value, trend_abs_value, trend_per_value], ignore_index=True)
-    value.to_excel(writer, sheet_name='Global_'+key )
+    abs_value2=pd.concat([abs_value,trend_abs_value], ignore_index=True)
+    per_value2=pd.concat([ per_value,trend_per_value], ignore_index=True)
+    
+    
+    
+    value=abs_value2.merge(per_value2, on=['Country','Years'])
+    value.to_excel(writer, sheet_name='Global_'+key , index=False)
 
 
+    del abs_value, per_value, trend_per_value, abs_value2, per_value2
+    
+    
+    #
+    # This is the overall spending Dashboard
+    #
+    
+    abs_spend = df_filter_helper(data[key], data[key])
+    abs_spend = transform_column_rows(abs_spend)
+    abs_spend["Type"] = 'Absolute'
+    
+    cap_spend = df_filter_helper(per_cap[key], data[key])
+    cap_spend = transform_column_rows(cap_spend)
+    cap_spend["Type"] = 'Per Capita'
+    
+    gdp_spend = df_filter_helper(per_gdp[key], data[key])
+    gdp_spend = transform_column_rows(gdp_spend)
+    gdp_spend["Type"] = 'Percent GDP'
+    
+    
+    spend_dash = pd.concat([abs_spend, cap_spend,gdp_spend]).reset_index(drop=True)
+    spend_dash = pd.concat([spend_dash.iloc[:,-1],spend_dash.iloc[:,0:-1] ],axis=1,)
+    
+    spend_dash.to_excel(writer, sheet_name='Dashboard_'+key , index=False)
+    
+    del abs_spend, cap_spend, gdp_spend
+    
+
+    #
+    ## Now the Health vs Military Spending
+    #
+    
+    mil_spend = df_filter_helper(data['MIL'], data[key])
+    
+    mil_spend = mil_spend.dropna().reset_index().melt(id_vars='index')
+    mil_spend = mil_spend.rename(columns={'index':'Country', 'variable':'Years', 'value':'Military'}) 
+    mil_spend["Labels"]=mil_spend["Country"]+' '+mil_spend["Years"].reset_index(drop=True)
+    mil_spend = pd.concat([mil_spend.iloc[:,-1],mil_spend.iloc[:,0:-1] ],axis=1,)
+    
+    
+    var_spend = df_filter_helper(data[key], data[key])
+    
+    var_spend = var_spend.dropna().reset_index().melt(id_vars='index')
+    var_spend = var_spend.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    
+    
+    mil_stacked=mil_spend.merge(var_spend, on=['Country','Years'])
+    mil_stacked.to_excel(writer, sheet_name='MIL_'+key , index=False)
+    
+    del mil_spend, var_spend
+    
+    
+    
+    
+    #
+    # This is the overall spending Dashboard
+    #
+    
+    bubble_gdp = df_filter_helper(per_cap["GDP"], data[key])
+    bubble_gdp = bubble_gdp.dropna().reset_index().melt(id_vars='index')
+    bubble_gdp = bubble_gdp.rename(columns={'index':'Country', 'variable':'Years', 'value':'GDP per Capita'}) 
+    
+    
+    
+    bubble_var = df_filter_helper(per_cap[key], data[key])
+    bubble_var = bubble_var.dropna().reset_index().melt(id_vars='index')
+    bubble_var = bubble_var.rename(columns={'index':'Country', 'variable':'Years', 'value':key.capitalize()}) 
+    bubble_var['Size'] = 1
+    
+    bubble_out=pd.concat([bubble_var.Years,bubble_gdp['GDP per Capita'], bubble_var[key.capitalize()],
+               bubble_gdp['Country'],bubble_var['Size'], bubble_var['Years'].astype(int)  ], axis=1)
+    
+    bubble_out.to_excel(writer, sheet_name='Bubble_'+key, index=False )
+    
+    del bubble_gdp,bubble_var
+        
+
+    
+    #
+    #Absolute Volume
+    #
+    
+    abs_value = df_filter_helper(abs_change[key], data[key]).iloc[:,1::]
+    abs_value = transform_column_rows(abs_value)
+    abs_value["Type"] = 'Absolute Change'
+    
+    
+    per_value = df_filter_helper(per_change[key], data[key]).iloc[:,1::]
+    per_value = transform_column_rows(per_value)
+    per_value["Type"] = 'Percent Change'
+       
+    line_plot = pd.concat([abs_value, per_value]).reset_index(drop=True)
+    line_plot = pd.concat([line_plot.iloc[:,-1],line_plot.iloc[:,0:-1] ],axis=1,)
+    
+    line_plot.to_excel(writer, sheet_name='Line_Change_'+key , index=False)
+    
+    del abs_value, per_value
+    
+    
+    
 #Save and close the whole file
 writer.save()
-
-
-
-#%%
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
+
+
     

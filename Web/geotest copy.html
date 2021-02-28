@@ -38,15 +38,14 @@ function drawSheetName(sheetName, query, responseHandler){
 var geo_mode = "Absolute";
 function changeView() {
 
-  if(geo_mode == "Absolute"){
-    drawSheetName ('Global_Health', 'SELECT A,B,D', drawGeoDashboard);
-  geo_mode = "Percent"
-}else{
-  drawSheetName ('Global_Health', 'SELECT A,B,C', drawGeoDashboard);
-  geo_mode = "Absolute"
-}
-
-}
+    if(geo_mode == "Absolute"){
+      drawSheetName ('Global_Health', 'SELECT A,B,D', drawGeoDashboard);
+    geo_mode = "Percent"
+  }else{
+    drawSheetName ('Global_Health', 'SELECT A,B,C', drawGeoDashboard);
+    geo_mode = "Absolute"
+  }
+};
 
 
 

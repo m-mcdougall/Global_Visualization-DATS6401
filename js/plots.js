@@ -217,7 +217,7 @@ function drawDashboard_health_mil(response) {
                   width : 1200,
                   height: 500,
                   bubble: {textStyle: {color: 'none'}},
-                  vAxis: {title: 'Per Capita GDP Spending',
+                  vAxis: {title: 'Per Capita GDP',
                           viewWindow: { 
                               min: 0,
                               max: rangeY.max+fractionY
@@ -274,17 +274,18 @@ function drawDashboard_health_mil(response) {
           'containerId': 'health_change_dashboard_div',
           view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
           options : {
-                          chartArea: {width:'60%', height:'60%'},
-                          width : 1000,
-                          height: 400,
-                          vAxis: {title: 'Spending',  format: 'short', gridlines: {color: 'transparent'}},
-                          hAxis: {title: 'Year', slantedText: false, format:'#,####', minorGridlines: {color: 'transparent'} },
-                          colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',],   
-                          explorer: { 
-                  actions: ['dragToZoom', 'rightClickToReset'],
-                  keepInBounds: true,
-                  maxZoomIn: 4.0},          
-                      },
+                chartArea: {width:'60%', height:'60%'},
+                width : 1000,
+                height: 400,
+                vAxis: {title: 'Spending',  format: 'short', gridlines: {color: 'transparent'}},
+                hAxis: {title: 'Year', slantedText: false, format:'#,####', gridlines: {color: 'grey'} },
+                //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
+                colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',],   
+                explorer: { 
+                actions: ['dragToZoom', 'rightClickToReset'],
+                keepInBounds: true,
+                maxZoomIn: 4.0},          
+                },
                   
       
         });
@@ -551,7 +552,7 @@ function drawDashboard_edu_bubble_gdp(response) {
             width : 1200,
             height: 500,
             bubble: {textStyle: {color: 'none'}},
-            vAxis: {title: 'Per Capita GDP Spending',
+            vAxis: {title: 'Per Capita GDP',
                     viewWindow: { 
                         min: 0,
                         max: rangeY.max+fractionY
@@ -608,18 +609,18 @@ function drawDashboard_edu_bubble_gdp(response) {
         'containerId': 'edu_change_dashboard_div',
         view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
         options : {
-                        chartArea: {width:'60%', height:'60%'},
-                        width : 1000,
-                        height: 400,
-                        vAxis: {title: 'Spending',  format: 'short', gridlines: {color: 'transparent'}},
-                        hAxis: {title: 'Year', slantedText: false, format:'#,####', minorGridlines: {color: 'transparent'} },
-                        //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
-                        colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',],   
-                        explorer: { 
-                actions: ['dragToZoom', 'rightClickToReset'],
-                keepInBounds: true,
-                maxZoomIn: 4.0},          
-                    },
+                chartArea: {width:'60%', height:'60%'},
+                width : 1000,
+                height: 400,
+                vAxis: {title: 'Spending',  format: 'short', gridlines: {color: 'transparent'}},
+                hAxis: {title: 'Year', slantedText: false, format:'#,####', minorGridlines: {color: 'transparent'}, },
+                //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
+                colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',],   
+                explorer: { 
+        actions: ['dragToZoom', 'rightClickToReset'],
+        keepInBounds: true,
+        maxZoomIn: 4.0},          
+            },
                 
     
       });
@@ -816,7 +817,7 @@ function drawDashboard_mil_bubble_gdp(response) {
                 width : 1200,
                 height: 500,
                 bubble: {textStyle: {color: 'none'}},
-                vAxis: {title: 'Per Capita GDP Spending',
+                vAxis: {title: 'Per Capita GDP',
                         viewWindow: { 
                             min: 0,
                             max: rangeY.max+fractionY

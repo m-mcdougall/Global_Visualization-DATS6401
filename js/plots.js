@@ -1,23 +1,23 @@
 
-google.charts.load('current', {'packages':['corechart', 'geochart', 'controls'],
+google.charts.load('45', {'packages':['corechart', 'geochart', 'controls'],
                     'mapsApiKey': 'AIzaSyBoVxauKlXr5UIbGZzMpsao8hc8haGG64Y'});
 google.charts.setOnLoadCallback(drawAllSheets);
 window.addEventListener('resize', drawAllSheets, false);
 
 function drawAllSheets() {
-    drawSheetName ('Dashboard_HEAL', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L', drawDashboard_health);
+    drawSheetName ('Dashboard_HEAL', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L,M', drawDashboard_health);
     drawSheetName ('MIL_HEAL', 'SELECT A,B,C,D,E', drawDashboard_health_mil);
     drawSheetName ('Bubble_HEAL', 'SELECT A,B,C,D,E,F', drawDashboard_health_bubble_gdp);
     drawSheetName ('Line_Change_HEAL', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L', drawLineHealthDashboard);
     drawSheetName ('Global_HEAL', 'SELECT A,B,D', drawGeoDashboard);
 
-    drawSheetName ('Dashboard_EDU', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L', drawDashboard_edu);
+    drawSheetName ('Dashboard_EDU', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L,M', drawDashboard_edu);
     drawSheetName ('MIL_EDU', 'SELECT A,B,C,D,E', drawDashboard_edu_mil);
     drawSheetName ('Bubble_EDU', 'SELECT A,B,C,D,E,F', drawDashboard_edu_bubble_gdp);
     drawSheetName ('Line_Change_EDU', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L', drawLineEduDashboard);
     drawSheetName ('Global_EDU', 'SELECT A,B,D', drawGeoDashboardEdu);
 
-    drawSheetName ('Dashboard_MIL', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L', drawDashboard_mil);
+    drawSheetName ('Dashboard_MIL', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L,M', drawDashboard_mil);
     drawSheetName ('Bubble_MIL', 'SELECT A,B,C,D,E,F', drawDashboard_mil_bubble_gdp);
     drawSheetName ('Line_Change_MIL', 'SELECT A,B,C,D,E,F,G,H,I,J,K,L', drawLineMilDashboard);
     drawSheetName ('Global_MIL', 'SELECT A,B,D', drawGeoDashboardMil);
@@ -65,7 +65,7 @@ function drawDashboard_health(response) {
       'controlType': 'NumberRangeFilter',
       'containerId': 'filter2_div',
       'options': {
-        'filterColumnLabel': 'Years',
+        'filterColumnLabel': 'Years_filter',
         'ui': {
           'label': 'Select Year Range',
           format: {pattern: '0000'},
@@ -73,7 +73,8 @@ function drawDashboard_health(response) {
           'allowTyping': false, 
           'allowMultiple': false  
         }
-      }
+      },
+      state: {'lowValue': 2011, 'highValue': 2017}
     });
     
     //Actual chart wrapper here
@@ -82,7 +83,7 @@ function drawDashboard_health(response) {
       'containerId': 'health_dashboard_div',
       view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
       options : {
-                      chartArea: {width:'70%', height:'60%'},
+                      chartArea: {width:'70%', height:'60%',},
                       width : 1200,
                       height: 400,
                       vAxis: {title: 'Spending',  format: 'short', },
@@ -150,7 +151,7 @@ function drawDashboard_health_mil(response) {
       'containerId': 'health_mil_dashboard_div',
       view: {columns: [0,3,4]},
       options : {
-                      chartArea: {width:'75%', height:'50%'},
+                      chartArea: {width:'75%', height:'50%', left: '10%'},
                       width : 1200,
                       height: 600,
                       isStacked: true,
@@ -224,12 +225,11 @@ function drawDashboard_health_mil(response) {
                           minorGridlines: {color: 'transparent'} , 
                           format: 'short' },
                   hAxis: {title: 'Year',  
-                          viewWindow: { 
-                              min: rangeX.min-fractionX,
-                              max: rangeX.max+fractionX
-                              }, 
+
                               format:'#,####', 
-                              gridlines: {color: 'transparent'} }, 
+                              gridlines: {color: 'transparent', count:9},
+                              ticks: [{v:2010, f:''},'2011', '2012', '2013', '2014', '2015', '2016', 
+                              '2017', {v:2018, f:''}] }, 
                   colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
               }
   
@@ -401,7 +401,7 @@ function drawDashboard_edu(response) {
     'controlType': 'NumberRangeFilter',
     'containerId': 'filter2_edu_div',
     'options': {
-      'filterColumnLabel': 'Years',
+      'filterColumnLabel': 'Years_filter',
       'ui': {
         'label': 'Select Year Range',
         format: {pattern: '0000'},
@@ -547,26 +547,24 @@ function drawDashboard_edu_bubble_gdp(response) {
     'containerId': 'edu_gdp_dashboard_div',
     view: {columns: [0,1,2,3,4]},
     options : {
-                chartArea: {width:'65%', height:'60%'},
-                width : 1000,
-                height: 500,
-                bubble: {textStyle: {color: 'none'}},
-                vAxis: {title: 'Per Capita GDP Spending',
-                        viewWindow: { 
-                            min: 0,
-                            max: rangeY.max+fractionY
-                            },
-                        minorGridlines: {color: 'transparent'} , 
-                        format: 'short' , 
-                        textPosition: 'in' },
-                hAxis: {title: 'Year',  
-                        viewWindow: { 
-                            min: rangeX.min-fractionX,
-                            max: rangeX.max+fractionX
-                            }, 
-                            format:'#,####', 
-                            gridlines: {color: 'transparent'} }, 
-                colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
+            chartArea: {width:'60%', height:'60%'},
+            width : 1200,
+            height: 500,
+            bubble: {textStyle: {color: 'none'}},
+            vAxis: {title: 'Per Capita GDP Spending',
+                    viewWindow: { 
+                        min: 0,
+                        max: rangeY.max+fractionY
+                        },
+                    minorGridlines: {color: 'transparent'} , 
+                    format: 'short' },
+            hAxis: {title: 'Year',  
+
+                        format:'#,####', 
+                        gridlines: {color: 'transparent', count:9},
+                        ticks: [{v:2010, f:''},'2011', '2012', '2013', '2014', '2015', '2016', 
+                        '2017', {v:2018, f:''}] }, 
+            colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
   }
 
   });
@@ -741,7 +739,7 @@ function drawDashboard_mil(response) {
     'controlType': 'NumberRangeFilter',
     'containerId': 'filter2_mil_dash_div',
     'options': {
-      'filterColumnLabel': 'Years',
+      'filterColumnLabel': 'Years_filter',
       'ui': {
         'label': 'Select Year Range',
         format: {pattern: '0000'},
@@ -814,8 +812,8 @@ function drawDashboard_mil_bubble_gdp(response) {
     'containerId': 'mil_gdp_dashboard_div',
     view: {columns: [0,1,2,3,4]},
     options : {
-                chartArea: {width:'65%', height:'60%'},
-                width : 1000,
+                chartArea: {width:'60%', height:'60%'},
+                width : 1200,
                 height: 500,
                 bubble: {textStyle: {color: 'none'}},
                 vAxis: {title: 'Per Capita GDP Spending',
@@ -824,14 +822,13 @@ function drawDashboard_mil_bubble_gdp(response) {
                             max: rangeY.max+fractionY
                             },
                         minorGridlines: {color: 'transparent'} , 
-                         format: 'short' } ,
+                        format: 'short' },
                 hAxis: {title: 'Year',  
-                        viewWindow: { 
-                            min: rangeX.min-fractionX,
-                            max: rangeX.max+fractionX
-                            }, 
+
                             format:'#,####', 
-                            gridlines: {color: 'transparent'} }, 
+                            gridlines: {color: 'transparent', count:9},
+                            ticks: [{v:2010, f:''},'2011', '2012', '2013', '2014', '2015', '2016', 
+                            '2017', {v:2018, f:''}] }, 
                 colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
             }
 

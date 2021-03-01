@@ -13,15 +13,11 @@ http://localhost:9000/
 Changes To- Do
 
 
-Change the top 10 to a take-away summary
-
-Add flags
 
 ##########
 
 Changes Wishlist (Non-essential)
 
-Add a button on the profiles to swap between modelos
 
 Make the box around the 'Healthcare' smaller
 

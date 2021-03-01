@@ -63,7 +63,7 @@
                             <i class="fas fa-head-side-cough fa-stack-1x fa-inverse"></i>
                         </span>
                         <h4 class="my-3">Healthcare</h4>
-                        <p class="text-muted">The national spending on heathcare for its residents. Data originally captured as % GDP, but converted into current USD. </p>
+                        <p class="text-muted">The national spending on heathcare for its residents, in current USD.</p>
                     </div>
                     <div class="col-md-4">
                         <span class="fa-stack fa-4x">
@@ -71,7 +71,7 @@
                             <i class="fas fa-book fa-stack-1x fa-inverse"></i>
                         </span>
                         <h4 class="my-3">Education</h4>
-                        <p class="text-muted">The national spending on education, from primary to tertiary education. Data originally captured as % GDP, but converted into current USD. </p>
+                        <p class="text-muted">The national spending on education, from primary to tertiary education, in current USD. </p>
                     </div>
                     <div class="col-md-4">
                         <span class="fa-stack fa-4x">
@@ -254,7 +254,7 @@
             <div class="container" id='tag_mil'>
                 <div class="text-center-bgd">
                     <h2 class="section-heading text-uppercase">Military Analysis</h2>
-                    <h3 class="section-subheading text-muted" style="padding-bottom: 8px;">Here we examine international Education spending.</h3>
+                    <h3 class="section-subheading text-muted" style="padding-bottom: 8px;">Here we examine international Military spending.</h3>
                 </div>
                 <div class="row">
                     <div class="col-lg-6 col-sm-6 mb-4">
@@ -413,7 +413,7 @@
                             </div>
                             <div class="col-md-9 text-lg-left">
                                 <h4 class="my-3">Data Sources</h4>
-                                <p class="text-source">Healthcare Data: Global Healthcare Data (% of GDP) - <a href="https://data.worldbank.org/indicator/SE.XPD.TOTL.GD.ZS"> WorldBank</a> </p>
+                                <p class="text-source">Healthcare Data: Current Health Expenditure (% of GDP) - <a href="https://data.worldbank.org/indicator/SH.XPD.CHEX.GD.ZS"> WorldBank</a> </p>
                                 <p class="text-source">Military Data: Military Expenditure (current USD) - <a href="https://data.worldbank.org/indicator/MS.MIL.XPND.CD"> WorldBank</a> </p>
                                 <p class="text-source">GDP Data: GDP (current USD) - <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD"> WorldBank</a> </p>
                                 <p class="text-source">Population Data: Population, total - <a href="https://data.worldbank.org/indicator/SP.POP.TOTL"> WorldBank</a> </p>
@@ -432,8 +432,11 @@
                             </div>
                             <div class="col-md-9 text-lg-left" >
                                 <h4 class="my-3">Data Analysis</h4>
-                                <p class="text-source">Data from all datasets were cleaned and aggregated in Python 3.6.4 using the included script. Only data from the past 10 years were considered.
+                                <p class="text-source" style="margin-bottom: 1rem;">Data from all datasets were cleaned and aggregated in Python 3.6.4 using the included script. Only data from the past 10 years were considered.
                                     The past 10 years were sampled, and 2011-2017 were selected for analysis, as this span was the most complete across the metrics of interest. </p>
+                                <p class="text-source" style="margin-bottom: 1rem;">Some datasets (notably Healthcare and Education) were originally sourced as % GDP, rather than current USD. These datasets
+                                    were converted to current USD using the GDP data for that country.
+                                </p>
                                 <p class="text-source">Where datapoints were missing, but at least 2 datapoints existed for the 5 years of analysis, a linear model was fit to the 
                                     existing data. The predicted datapoints were interpolated into the dataset. If less than two datapoints existed, the country was 
                                     removed from the analysis.
@@ -519,7 +522,7 @@
                                 <div class="modal-body">
                                     <!-- Project Details Go Here-->
                                     <h2 class="text-uppercase">Healthcare vs Military</h2>
-                                    <p class="item-intro text-muted">Compare Healcare and Military Spending</p>
+                                    <p class="item-intro text-muted">Compare Healthcare and Military Spending</p>
                                     <div class='row justify-content-center' id='health_mil_dashboard_div'></div>
                                     <div class='row justify-content-center' id="buttons_div" style="margin-bottom: 2rem;">
                                         <div id="filter_mil_div" class="col-8" ></div>
@@ -703,7 +706,7 @@
                                 <div class="modal-body">
                                     <!-- Project Details Go Here-->
                                     <h2 class="text-uppercase">Education vs Military</h2>
-                                    <p class="item-intro text-muted">Compare Healcare and Military Spending</p>
+                                    <p class="item-intro text-muted">Compare Healthcare and Military Spending</p>
                                     <div class='row justify-content-center' id='edu_mil_dashboard_div' ></div>
                                     <div class='row justify-content-center' id="buttons_div" style="margin-bottom: 2rem;">
                                         <div id="filter_edu_mil_div" class="col-8" ></div>

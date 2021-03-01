@@ -82,14 +82,12 @@ function drawDashboard_health(response) {
       'containerId': 'health_dashboard_div',
       view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
       options : {
-                      chartArea: {width:'60%', height:'60%'},
-                      width : 1000,
+                      chartArea: {width:'70%', height:'60%'},
+                      width : 1200,
                       height: 400,
-                      annotations: {alwaysOutside: true},
                       vAxis: {title: 'Spending',  format: 'short', },
-                      hAxis: {title: 'Year', slantedText: false, format:'#,####'},
+                      hAxis: {title: 'Year', slantedText: false, format:'#,####', gridlines: {color: 'transparent'}},
                       tooltip: {format:'scientific'},    
-                      //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
                       colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
                   }
   
@@ -125,7 +123,8 @@ function drawDashboard_health_mil(response) {
         }
       },
       state: {
-        selectedValues: ['United States', 'China']
+        selectedValues: ['United States', 'Germany', 'Australia', 'France', 'Japan',
+        'United Kingdom', 'Italy', 'South Korea', 'Brazil', 'China', 'Canada']
       }
     });
   
@@ -151,7 +150,7 @@ function drawDashboard_health_mil(response) {
       'containerId': 'health_mil_dashboard_div',
       view: {columns: [0,3,4]},
       options : {
-                      chartArea: {width:'80%', height:'50%'},
+                      chartArea: {width:'75%', height:'50%'},
                       width : 1200,
                       height: 600,
                       isStacked: true,
@@ -186,7 +185,7 @@ function drawDashboard_health_mil(response) {
         'filterColumnLabel': 'Country',
         'ui': {
           'label': 'Select countries to Display',
-          'labelStacking': 'vertical',
+          'labelStacking': 'horizontal',
           'allowTyping': false, //User gets a text box to type into
           'allowMultiple': true,   /// Lets you select dorp-down options one at a time, can click multiple at a time - Useful but not for here
           'allowNone' : false //disables the "Select a value" - it's confusing
@@ -194,25 +193,11 @@ function drawDashboard_health_mil(response) {
       },
       state: {
         selectedValues: ['United States', 'Germany', 'Australia', 'France', 'Japan',
-                      'United Kingdom', 'Italy', 'South Korea', 'Brazil', 'China']
+                      'United Kingdom', 'Italy', 'South Korea', 'Brazil', 'China', 'Canada']
       }
     });
   
-    //Second Control wrapper  - Sliding bar that Filters by Year of Data
-    var TypePicker = new google.visualization.ControlWrapper({
-      'controlType': 'NumberRangeFilter',
-      'containerId': 'filter2_gdp_div',
-      'options': {
-        'filterColumnLabel': 'Year',
-        'ui': {
-          'label': 'Select Year Range',
-          format: {pattern: '0000'},
-          'labelStacking': 'vertical',
-          'allowTyping': false, 
-          'allowMultiple': false  
-        }
-      }
-    });
+
   
   
   //Need to calculate the range to adjust the frame to the bubblesize or will cut off. Not done automatically for some reason.
@@ -225,33 +210,34 @@ function drawDashboard_health_mil(response) {
     var DashColumnChart = new google.visualization.ChartWrapper({
       'chartType': 'BubbleChart',
       'containerId': 'health_gdp_dashboard_div',
-      view: {columns: [0,1,2,3]},
+      view: {columns: [0,1,2,3,4]},
       options : {
-                      chartArea: {width:'60%', height:'60%'},
-                      width : 1000,
-                      height: 400,
-                      sizeAxis :{ maxSize: 20},
-                      vAxis: {title: 'Spending',
-                              viewWindow: { 
-                                  min: rangeY.min-fractionY,
-                                  max: rangeY.max+fractionY
-                                  },
-                              format: 'short',  },
-                      hAxis: {title: 'Per Capita Healthcare Spending',  
-                              viewWindow: { 
-                                  min: rangeX.min-fractionX,
-                                  max: rangeX.max+fractionX
-                                  },
-                              format: 'short',  },
-                      //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
-                      colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
-                  }
+                  chartArea: {width:'60%', height:'60%'},
+                  width : 1200,
+                  height: 500,
+                  bubble: {textStyle: {color: 'none'}},
+                  vAxis: {title: 'Per Capita GDP Spending',
+                          viewWindow: { 
+                              min: 0,
+                              max: rangeY.max+fractionY
+                              },
+                          minorGridlines: {color: 'transparent'} , 
+                          format: 'short' },
+                  hAxis: {title: 'Year',  
+                          viewWindow: { 
+                              min: rangeX.min-fractionX,
+                              max: rangeX.max+fractionX
+                              }, 
+                              format:'#,####', 
+                              gridlines: {color: 'transparent'} }, 
+                  colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
+              }
   
     });
   
   
         var dashboard = new google.visualization.Dashboard(document.getElementById('health_gdp_dashboard_div')).
-      bind([namePicker, TypePicker], DashColumnChart).
+      bind([namePicker], DashColumnChart).
       draw(data)
   
       }//End BubbleChart
@@ -293,7 +279,6 @@ function drawDashboard_health_mil(response) {
                           height: 400,
                           vAxis: {title: 'Spending',  format: 'short', gridlines: {color: 'transparent'}},
                           hAxis: {title: 'Year', slantedText: false, format:'#,####', minorGridlines: {color: 'transparent'} },
-                          //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
                           colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',],   
                           explorer: { 
                   actions: ['dragToZoom', 'rightClickToReset'],
@@ -433,14 +418,12 @@ function drawDashboard_edu(response) {
     'containerId': 'edu_dashboard_div',
     view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
     options : {
-                    chartArea: {width:'60%', height:'60%'},
-                    width : 1000,
+                    chartArea: {width:'70%', height:'60%'},
+                    width : 1200,
                     height: 400,
-                    annotations: {alwaysOutside: true},
                     vAxis: {title: 'Spending',  format: 'short', },
-                    hAxis: {title: 'Year', slantedText: false, format:'#,####'},
+                    hAxis: {title: 'Year', slantedText: false, format:'#,####', gridlines: {color: 'transparent'}},
                     tooltip: {format:'scientific'},    
-                    //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
                     colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
                 }
 
@@ -476,7 +459,8 @@ function drawDashboard_edu_mil(response) {
       }
     },
     state: {
-      selectedValues: ['United States',]
+      selectedValues: ['United States', 'Germany', 'Brazil', 'France', 'Japan',
+      'United Kingdom', 'Russia', 'Australia', 'Italy', 'India' ]
     }
   });
 
@@ -544,25 +528,11 @@ function drawDashboard_edu_bubble_gdp(response) {
       }
     },
     state: {
-      selectedValues: ['United States', ]
+      selectedValues: ['United States', 'Germany', 'Brazil', 'France', 'Japan',
+      'United Kingdom', 'Russia', 'Australia', 'Italy', 'India' ]
     }
   });
 
-  //Second Control wrapper  - Sliding bar that Filters by Year of Data
-  var TypePicker = new google.visualization.ControlWrapper({
-    'controlType': 'NumberRangeFilter',
-    'containerId': 'filter2_edu_gdp_div',
-    'options': {
-      'filterColumnLabel': 'Year',
-      'ui': {
-        'label': 'Select Year Range',
-        format: {pattern: '0000'},
-        'labelStacking': 'vertical',
-        'allowTyping': false, 
-        'allowMultiple': false  
-      }
-    }
-  });
 
 
 //Need to calculate the range to adjust the frame to the bubblesize or will cut off. Not done automatically for some reason.
@@ -575,33 +545,35 @@ function drawDashboard_edu_bubble_gdp(response) {
   var DashColumnChart = new google.visualization.ChartWrapper({
     'chartType': 'BubbleChart',
     'containerId': 'edu_gdp_dashboard_div',
-    view: {columns: [0,1,2,3]},
+    view: {columns: [0,1,2,3,4]},
     options : {
-                    chartArea: {width:'60%', height:'60%'},
-                    width : 1000,
-                    height: 400,
-                    sizeAxis :{ maxSize: 20},
-                    vAxis: {title: 'Spending',
-                            viewWindow: { 
-                                min: rangeY.min-fractionY,
-                                max: rangeY.max+fractionY
-                                },
-                            format: 'short',  },
-                    hAxis: {title: 'Per Capita Healthcare Spending',  
-                            viewWindow: { 
-                                min: rangeX.min-fractionX,
-                                max: rangeX.max+fractionX
-                                },
-                            format: 'short',  },
-                    //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
-                    colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
-                }
+                chartArea: {width:'65%', height:'60%'},
+                width : 1000,
+                height: 500,
+                bubble: {textStyle: {color: 'none'}},
+                vAxis: {title: 'Per Capita GDP Spending',
+                        viewWindow: { 
+                            min: 0,
+                            max: rangeY.max+fractionY
+                            },
+                        minorGridlines: {color: 'transparent'} , 
+                        format: 'short' , 
+                        textPosition: 'in' },
+                hAxis: {title: 'Year',  
+                        viewWindow: { 
+                            min: rangeX.min-fractionX,
+                            max: rangeX.max+fractionX
+                            }, 
+                            format:'#,####', 
+                            gridlines: {color: 'transparent'} }, 
+                colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
+  }
 
   });
 
 
       var dashboard = new google.visualization.Dashboard(document.getElementById('edu_gdp_dashboard_div')).
-    bind([namePicker, TypePicker], DashColumnChart).
+    bind([namePicker], DashColumnChart).
     draw(data)
 
     }//End BubbleChart
@@ -748,7 +720,7 @@ function drawDashboard_mil(response) {
   //First Control wrapper  - Filters by Category of Data
   var namePicker = new google.visualization.ControlWrapper({
     'controlType': 'CategoryFilter',
-    'containerId': 'filter_mil_div',
+    'containerId': 'filter_mil_dash_div',
     'options': {
       'filterColumnLabel': 'Type',
       'ui': {
@@ -767,7 +739,7 @@ function drawDashboard_mil(response) {
   //Second Control wrapper  - Sliding bar that Filters by Year of Data
   var TypePicker = new google.visualization.ControlWrapper({
     'controlType': 'NumberRangeFilter',
-    'containerId': 'filter2_mil_div',
+    'containerId': 'filter2_mil_dash_div',
     'options': {
       'filterColumnLabel': 'Years',
       'ui': {
@@ -786,16 +758,14 @@ function drawDashboard_mil(response) {
     'containerId': 'mil_dashboard_div',
     view: {columns: [1,2,3,4,5,6,7,8,9,10,11]},
     options : {
-                    chartArea: {width:'60%', height:'60%'},
-                    width : 1000,
-                    height: 400,
-                    annotations: {alwaysOutside: true},
-                    vAxis: {title: 'Spending',  format: 'short', },
-                    hAxis: {title: 'Year', slantedText: false, format:'#,####'},
-                    tooltip: {format:'scientific'},    
-                    //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
-                    colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
-                }
+                  chartArea: {width:'70%', height:'60%'},
+                  width : 1200,
+                  height: 400,
+                  vAxis: {title: 'Spending',  format: 'short', },
+                  hAxis: {title: 'Year', slantedText: false, format:'#,####', gridlines: {color: 'transparent'}},
+                  tooltip: {format:'scientific'},    
+                  colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
+              }
 
   });
 
@@ -819,30 +789,15 @@ function drawDashboard_mil_bubble_gdp(response) {
       'filterColumnLabel': 'Country',
       'ui': {
         'label': 'Select countries to Display',
-        'labelStacking': 'vertical',
+        'labelStacking': 'horizontal',
         'allowTyping': false, //User gets a text box to type into
         'allowMultiple': true,   /// Lets you select dorp-down options one at a time, can click multiple at a time - Useful but not for here
         'allowNone' : false //disables the "Select a value" - it's confusing
       }
     },
     state: {
-      selectedValues: ['United States', ]
-    }
-  });
-
-  //Second Control wrapper  - Sliding bar that Filters by Year of Data
-  var TypePicker = new google.visualization.ControlWrapper({
-    'controlType': 'NumberRangeFilter',
-    'containerId': 'filter2_mil_gdp_div',
-    'options': {
-      'filterColumnLabel': 'Year',
-      'ui': {
-        'label': 'Select Year Range',
-        format: {pattern: '0000'},
-        'labelStacking': 'vertical',
-        'allowTyping': false, 
-        'allowMultiple': false  
-      }
+      selectedValues: ['United States', 'Germany', 'India', 'France', 'Japan',
+      'United Kingdom', 'Russia', 'South Korea', 'Saudi Arabia', 'China', ]
     }
   });
 
@@ -857,33 +812,34 @@ function drawDashboard_mil_bubble_gdp(response) {
   var DashColumnChart = new google.visualization.ChartWrapper({
     'chartType': 'BubbleChart',
     'containerId': 'mil_gdp_dashboard_div',
-    view: {columns: [0,1,2,3]},
+    view: {columns: [0,1,2,3,4]},
     options : {
-                    chartArea: {width:'60%', height:'60%'},
-                    width : 1000,
-                    height: 400,
-                    sizeAxis :{ maxSize: 20},
-                    vAxis: {title: 'Spending',
-                            viewWindow: { 
-                                min: rangeY.min-fractionY,
-                                max: rangeY.max+fractionY
-                                },
-                            format: 'short',  },
-                    hAxis: {title: 'Per Capita Healthcare Spending',  
-                            viewWindow: { 
-                                min: rangeX.min-fractionX,
-                                max: rangeX.max+fractionX
-                                },
-                            format: 'short',  },
-                    //colors: ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#000',]  
-                    colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#bfef45', '#000',]             
-                }
+                chartArea: {width:'65%', height:'60%'},
+                width : 1000,
+                height: 500,
+                bubble: {textStyle: {color: 'none'}},
+                vAxis: {title: 'Per Capita GDP Spending',
+                        viewWindow: { 
+                            min: 0,
+                            max: rangeY.max+fractionY
+                            },
+                        minorGridlines: {color: 'transparent'} , 
+                         format: 'short' } ,
+                hAxis: {title: 'Year',  
+                        viewWindow: { 
+                            min: rangeX.min-fractionX,
+                            max: rangeX.max+fractionX
+                            }, 
+                            format:'#,####', 
+                            gridlines: {color: 'transparent'} }, 
+                colors: ['#e6194B', '#f58231', '#ffe119', '#bfef45', '#3cb44b', '#42d4f4', '#4363d8', '#911eb4', '#Bcbcbc', '#000','grey']             
+            }
 
   });
 
 
       var dashboard = new google.visualization.Dashboard(document.getElementById('mil_gdp_dashboard_div')).
-    bind([namePicker, TypePicker], DashColumnChart).
+    bind([namePicker], DashColumnChart).
     draw(data)
 
     }//End BubbleChart

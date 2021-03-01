@@ -413,8 +413,13 @@
                             </div>
                             <div class="col-md-9 text-lg-left">
                                 <h4 class="my-3">Data Sources</h4>
-                                <p class="text-source">Data sourced from the World Bank, and missing values filled in with supplimental data from OECD. </p>
-                                <p class="text-source">Data sourced from the World Bank. </p>
+                                <p class="text-source">Healthcare Data: Global Healthcare Data (% of GDP) - <a href="https://data.worldbank.org/indicator/SE.XPD.TOTL.GD.ZS"> WorldBank</a> </p>
+                                <p class="text-source">Military Data: Military Expenditure (current USD) - <a href="https://data.worldbank.org/indicator/MS.MIL.XPND.CD"> WorldBank</a> </p>
+                                <p class="text-source">GDP Data: GDP (current USD) - <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD"> WorldBank</a> </p>
+                                <p class="text-source">Population Data: Population, total - <a href="https://data.worldbank.org/indicator/SP.POP.TOTL"> WorldBank</a> </p>
+                                <p class="text-source">Education Data: Government Expenditure on Education, total (% of GDP) - <a href="https://data.worldbank.org/indicator/SE.XPD.TOTL.GD.ZS"> WorldBank</a> </p>
+                                <p class="text-source">Supplimental Educational Data: Public spending on education Primary to tertiary, % of GDP, 1995 – 2016 - <a href="https://data.oecd.org/eduresource/public-spending-on-education.htm#indicator-chart"> OECD</a> </p>
+
                                 
                             </div>
                         </div><!-- Bottom of a data row-->
@@ -427,13 +432,29 @@
                             </div>
                             <div class="col-md-9 text-lg-left" >
                                 <h4 class="my-3">Data Analysis</h4>
-                                <p class="text-source">Data was cleaned. </p>
+                                <p class="text-source">Data from all datasets were cleaned and aggregated in Python 3.6.4 using the included script. Only data from the past 10 years were considered.
+                                    The past 10 years were sampled, and 2011-2017 were selected for analysis, as this span was the most complete across the metrics of interest. </p>
                                 <p class="text-source">Where datapoints were missing, but at least 2 datapoints existed for the 5 years of analysis, a linear model was fit to the 
-                                    existing data. The predicted datapoints were interpolated into the dataset. If less than two datapoints esisted, the country was 
+                                    existing data. The predicted datapoints were interpolated into the dataset. If less than two datapoints existed, the country was 
                                     removed from the analysis.
                                 </p>
-                                
                             </div>
+                            
+                        </div><!-- Bottom of a data row-->
+                       
+                        <div class="row text-center" style="margin-top: 2rem;">
+                            <div class="col-md-2">
+                                <span class="fa-stack fa-4x">
+                                    <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                    <i class="fas fa-wifi fa-stack-1x fa"></i>
+                                </span>
+                            </div>
+                            <div class="col-md-9 text-lg-left" >
+                                <h4 class="my-3">Bootstrap Template</h4>
+                                <p class="text-source">"Agency" Bootstrap template courtesy of <a href="https://startbootstrap.com/theme/agency">Start Bootstrap</a> </p>
+                                </p>
+                            </div>
+                            
                         </div><!-- Bottom of a data row-->
 
                     </div>
@@ -446,12 +467,7 @@
         <footer class="footer py-4">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-4 text-lg-left">Copyright © Mariko McDougall 2021</div>
-                    
-                    <div class="col-lg-4 text-lg-right">
-                        <a class="mr-3" href="#!">Privacy Policy</a>
-                        <a href="#!">Terms of Use</a>
-                    </div>
+                    <div class="col-lg-6 text-lg-right">Copyright © Mariko McDougall 2021</div>
                 </div>
             </div>
         </footer>
@@ -922,10 +938,11 @@
                                     </div>
                                     <p class="item-intro text-muted">Click and drag the plot to zoom in, right click to reset view.
                                         Absolute Change represents the change in Total USD spent vs the previous year, Percent Change
-                                        shows the change in funding as a percent of the healthcare budget</p>
+                                        shows the change in funding as a percent of the military budget</p>
                                     <h5>Observations</h5>
-                                    <p>Although total budgets appear to fluctuate massively, when viewed as a percent change it is clear that most
-                                        annual budget changes are very small, typically not exceeding +/- 0.2%. 
+                                    <p> Most nations in the top 10 of military spending maintained a consistant trend, either continuously increasing or decreasing their expenses by a similar amount each year.</p>
+                                    <p>
+                                        From 2011-2016, the US military budget decreased each year. Beginning in 2016, however the budget began to increase. 
                                     </p>
                                     <button class="btn btn-primary" data-dismiss="modal" type="button">
                                         <i class="fas fa-times mr-1"></i>

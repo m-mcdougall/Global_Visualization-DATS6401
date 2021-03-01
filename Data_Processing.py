@@ -4,9 +4,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import datetime
 import numpy as np
-import seaborn as sns
 from sklearn.linear_model import LinearRegression
 
 
@@ -133,37 +131,7 @@ for key in data:
 for key in data:
     data[key]=data[key].filter([str(i) for i in range(2011,2018)], axis=1)
     plot_percent_non_null(data[key])
-#%%
 
-
-
-def drop_non_reporters(df_in, max_percent_missing=0.6):
-    """
-    Drops countries from dataset if they have more than a given percent 
-    of their data missing
-    
-    df_in: The Dataframe of years of data
-    max_percent_missing: The maximum percent of missing data that is acceptable
-    """
-    
-    #Find number of missing datapoints for each country
-    years=df_in.shape[1]
-    missing_count=df_in.isna().sum(axis=1)
-    
-    #Filter out countries whose missing datapoints exceed the maximum
-    keep=missing_count<years*max_percent_missing
-    
-    print(f'\n---------------------')
-    print(f'\n The Following Countries have been Removed:\n\n{df_in[~keep].index.values}')
-    print(f'\n---------------------')
-    return df_in[keep]
-
-   
-
-#Remove Countries that are missing >80% of their data 
-#for key in data:
-#    data[key]=drop_non_reporters(data[key], max_percent_missing=0.8)
-#    plot_percent_non_null(data[key])
 
 
 #%%
@@ -379,32 +347,6 @@ for key in data:
 del gdp, pop
 
 
-#%%
-
-  
-#Scale data to appropriate levels for use
-#GDP and Military expenses in terms of billions
-#Population in millions
-
-#Scale Absolute data to Billions
-for key in data:
-    data[key] = data[key]#/10**9
-
-
-for key in abs_change:
-    abs_change[key] = abs_change[key]#/10**9
-
-
-
-#Scale POP to Millions
-#data[1].iloc[:,2:]=data[1].iloc[:,2:]/10**6    
-
-
-
-
-
-
-
 
 
 
@@ -460,7 +402,7 @@ for key in ['MIL', 'EDU', 'HEAL']:
 
 
 #Save and close the whole file
-writer.save()
+#writer.save()
 
 #%%
 
